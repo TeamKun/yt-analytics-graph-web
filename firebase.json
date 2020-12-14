@@ -11,6 +11,10 @@
   },
   "hosting": {
     "public": "public",
+    "predeploy": [
+      "npm --prefix \"src\" run lint",
+      "npm --prefix \"src\" run generate"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
