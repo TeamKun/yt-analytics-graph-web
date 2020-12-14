@@ -12,6 +12,7 @@
   "hosting": {
     "public": "public",
     "predeploy": [
+      "npm --prefix \"src\" install",
       "npm --prefix \"src\" run lint",
       "npm --prefix \"src\" run generate"
     ],
