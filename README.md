@@ -1,1 +1,1 @@
-yt-analytics-graph-web
+yt-graph-web
