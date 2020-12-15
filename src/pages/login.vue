@@ -227,9 +227,11 @@
   }
 }
 </style>
-<script>
-import { mapActions, mapState, mapGetters } from 'vuex'
-export default {
+<script lang="ts">
+import Vue from 'vue'
+import { authsStore } from '~/store'
+import Swal from 'sweetalert2'
+export default Vue.extend({
   layout: 'nonavbar',
   components: {
     logo: () => import('~/assets/svg/logo-login.svg'),
@@ -239,78 +241,63 @@ export default {
       loading: true,
     }
   },
-  computed: {
-    ...mapState(['user']),
-    ...mapGetters(['isAuthenticated']),
-  },
-  mounted() {
-    this.$fire.auth
-      .getRedirectResult()
-      .then((result) => {
-        console.log(result)
-        this.$fire.firestore
+  async mounted() {
+    this.$fire.auth.onAuthStateChanged(async (user) => {
+      authsStore.setUser(user)
+      if (user)
+        await this.$router.push('/dashboard')
+    })
+
+    try {
+      const result = await this.$fire.auth.getRedirectResult()
+
+      const user = result.user
+      if (user) {
+        const doc = await this.$fire.firestore
           .collection('users')
-          .where('uid', '==', result.user.uid)
+          .where('uid', '==', user.uid)
           .get()
-          .then((doc) => {
-            this.$fire.analytics.setUserId(result.user.uid)
-            if (!doc.empty) {
-              this.$fire.analytics.logEvent('login', {
-                method: result.credential.providerId,
-              })
-              doc.forEach(() => {
-                this.$router.push('/dashboard')
-              })
-            } else {
-              this.$fire.analytics.logEvent('sign_up', {
-                method: result.credential.providerId,
-              })
-              const userData = {
-                uid: result.user.uid,
-                photoURL: result.user.photoURL,
-              }
-              this.$fire.firestore
-                .collection('users')
-                .doc(result.user.uid)
-                .set(userData)
-              this.$router.push('/dashboard')
-            }
-            this.loading = false
-          })
-          .catch((err) => {
-            this.loading = false
-            console.log('hey')
-            console.log('Error getting documents', err)
-          })
-      })
-      .catch((err) => {
-        this.loading = false
-        console.log('Error getting documents', err)
-        if (err.code === 'auth/account-exists-with-different-credential') {
-          this.$swal({
-            icon: 'error',
-            title: 'ログインできませんでした',
-            text:
-              'このメールアドレスはすでに使用されています。アカウントをリンクしたい場合には、ダッシュボードから行ってください。',
-            confirmButtonColor: '#4c7b57',
-            confirmButtonText: 'OK',
+
+        this.$fire.analytics.setUserId(user.uid)
+        if (result.credential) {
+          const event: string = doc.empty ? 'sign_up' : 'login'
+          this.$fire.analytics.logEvent(event, {
+            method: result.credential.providerId,
           })
         }
-      })
-
-    setTimeout(() => {
-      this.$fire.auth.onAuthStateChanged((user) => {
-        this.setUser(user)
-      })
-    }, 0)
+        if (doc.empty) {
+          const userData = {
+            uid: user.uid,
+            photoURL: user.photoURL,
+          }
+          await this.$fire.firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(userData)
+        }
+      }
+    } catch (err) {
+      console.log('Error getting documents', err)
+      if (err.code === 'auths/account-exists-with-different-credential') {
+        await Swal.fire({
+          icon: 'error',
+          title: 'ログインできませんでした',
+          text:
+            'このメールアドレスはすでに使用されています。アカウントをリンクしたい場合には、ダッシュボードから行ってください。',
+          confirmButtonColor: '#4c7b57',
+          confirmButtonText: 'OK',
+        })
+      }
+    } finally {
+      this.loading = false
+    }
   },
   methods: {
-    ...mapActions(['setUser']),
     googleLogin() {
-      this.$fire.auth.signInWithRedirect(
-        new this.$fireModule.auth.GoogleAuthProvider()
-      )
+      const provider = new this.$fireModule.auth.GoogleAuthProvider()
+      provider.addScope('https://www.googleapis.com/auth/yt-analytics.readonly');
+      this.$fire.auth.signInWithRedirect(provider)
     },
   },
-}
+})
 </script>

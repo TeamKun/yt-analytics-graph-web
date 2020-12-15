@@ -11,8 +11,8 @@
       <nuxt-link v-if="!isAuthenticated" class="PageNavbar_button" to="/login">
         ログイン
       </nuxt-link>
-      <nuxt-link v-if="!isAuthenticated" class="PageNavbar_button" to="/login">
-        登録
+      <nuxt-link v-if="isAuthenticated" class="PageNavbar_button" to="/logout">
+        ログアウト
       </nuxt-link>
       <v-list>
         <v-list-item
@@ -70,8 +70,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
+import { authsStore } from '~/store'
 export default {
   data() {
     return {
@@ -97,7 +96,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isAuthenticated']),
+    isAuthenticated: () => authsStore.isAuthenticated,
   },
 }
 </script>

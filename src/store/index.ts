@@ -1,23 +1,5 @@
-export const strict = false
-
-export const state = () => ({
-  user: null,
-})
-
-export const mutations = {
-  setUser(state: { user: any }, payload: any) {
-    state.user = payload
-  },
-}
-
-export const actions = {
-  setUser({ commit }: any, payload: any) {
-    commit('setUser', payload)
-  },
-}
-
-export const getters = {
-  isAuthenticated(state: { user: any }) {
-    return !!state.user
-  },
-}
+import { Store } from 'vuex'
+import { initializeStores } from '~/utils/store-accessor'
+const initializer = (store: Store<any>) => initializeStores(store)
+export const plugins = [initializer]
+export * from '~/utils/store-accessor'
