@@ -38,10 +38,33 @@ export default {
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: 'AIzaSyC3in_8_RyuOuxhLMm4BSuf5g1isCzlgBQ',
+          authDomain: 'kun-analytics.firebaseapp.com',
+          databaseURL: 'https://kun-analytics.firebaseio.com',
+          projectId: 'kun-analytics',
+          storageBucket: 'kun-analytics.appspot.com',
+          messagingSenderId: '1078359196308',
+          appId: '1:1078359196308:web:4872bd4f2ead0559dcaa81',
+          measurementId: 'G-J6LP5BBHK6',
+        },
+        services: {
+          auth: true,
+          analytics: true,
+          firestore: true,
+          storage: true,
+        },
+      },
+    ],
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+    'vue-sweetalert2/nuxt',
+    'nuxt-svg-loader',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)

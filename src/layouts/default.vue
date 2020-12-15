@@ -7,6 +7,13 @@
       fixed
       app
     >
+      <!-- 未ログイン -->
+      <nuxt-link v-if="!isAuthenticated" class="PageNavbar_button" to="/login">
+        ログイン
+      </nuxt-link>
+      <nuxt-link v-if="!isAuthenticated" class="PageNavbar_button" to="/login">
+        登録
+      </nuxt-link>
       <v-list>
         <v-list-item
           v-for="(item, i) in items"
@@ -63,6 +70,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   data() {
     return {
@@ -86,6 +95,9 @@ export default {
       rightDrawer: false,
       title: 'Vuetify.js',
     }
+  },
+  computed: {
+    ...mapGetters(['isAuthenticated']),
   },
 }
 </script>
