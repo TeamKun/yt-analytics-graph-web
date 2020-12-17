@@ -96,7 +96,11 @@ export default {
     }
   },
   computed: {
-    isAuthenticated: () => authsStore.isAuthenticated,
-  },
+    isAuthenticated: {
+      get() {
+        return authsStore.isAuthenticated
+      }
+    }
+  }
 }
 </script>
