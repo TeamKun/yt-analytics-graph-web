@@ -12,7 +12,7 @@
         ログイン
       </nuxt-link>
       <nuxt-link v-if="isAuthenticated" class="PageNavbar_button" to="/logout">
-        ログアウト
+        {{ this.displayName }} としてログイン中 ログアウト
       </nuxt-link>
       <v-list>
         <v-list-item
@@ -96,11 +96,9 @@ export default {
     }
   },
   computed: {
-    isAuthenticated: {
-      get() {
-        return authsStore.isAuthenticated
-      }
-    }
+    isAuthenticated: () => authsStore.isAuthenticated,
+    uid: () => authsStore.getUid,
+    displayName: () => authsStore.getDisplayName,
   }
 }
 </script>
