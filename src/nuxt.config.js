@@ -56,6 +56,10 @@ export default {
           analytics: true,
           firestore: true,
           storage: true,
+          functions: {
+            location: "asia-northeast1",
+            emulatorPort: 5001,
+          },
         },
       },
     ],
